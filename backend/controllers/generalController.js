@@ -51,7 +51,11 @@ const validateTIN = async (tin, idType, idValue, authorizationToken) => {
   }
 };
 
-exports.getTravelAgentData = async (req, res) => {
+exports.verifyTIN = async (req, res) => {
+
+  console.log('req.body',req.body);
+
+
   try {
     const { authorizationtoken } = req.headers;
 
@@ -62,34 +66,43 @@ exports.getTravelAgentData = async (req, res) => {
       });
     }
 
-    const { tin, idType, idValue } = req.query;
+    const { tinNumber, idType, idNumber } = req.body;
+
+    console.log('req.body',req.body);
+    
 
     // Validate request parameters
-    const validationError = validateRequest(tin, idType, idValue);
+    const validationError = validateRequest(tinNumber, idType, idNumber);
     if (validationError) {
       return res.status(400).json({ error: validationError });
     }
 
     try {
       const validationResult = await validateTIN(
-        tin,
-        idType,
-        idValue,
+       tinNumber,idType,idNumber,
         authorizationtoken
       );
-      console.log("TIN Validation Result:", validationResult);
+      console.log("valiiiiiddd", validationResult);
 
       if (validationResult === 200) {
         return res.status(200).json({
           message: "You have a valid TIN!",
-          data: { tin, idType, idValue, validationResult },
+          data: {
+            tinNumber,
+            idType,
+            idNumber,
+          },
         });
       } else {
         return res.status(404).json({
           message: "INvalid TIN!",
-          data: { tin, idType, idValue, validationResult },
-        });
-      }
+          data: {
+            tinNumber,
+            idType,
+            idNumber,
+          },
+        }); 
+      }  
     } catch (error) {
       console.log("error".red, error.message);
       return error.message;
@@ -146,7 +159,7 @@ exports.getTravelAgentData = async (req, res) => {
       
       res.status(400).json({ error: error.response?.data?.error || 'Authentication failed' });
   }
-};
+}; 
 
 
 
@@ -157,6 +170,7 @@ exports.saveTravelAgentData = async (req, res) => {
       isMalaysian,
       tinNumber,
       idNumber,
+      idType,
       msicCode,
       industry,
       city,
@@ -182,6 +196,7 @@ exports.saveTravelAgentData = async (req, res) => {
         isMalaysian:isMalaysian,
         tinNumber:tinNumber,
         idNumber:idNumber,
+        idType:idType,
         msicCode:msicCode,
         industry:industry,
         city:city,
@@ -191,7 +206,9 @@ exports.saveTravelAgentData = async (req, res) => {
         contactNumber:contactNumber,
         clientId:clientId,
         clientSecret:clientSecret,
-        accessToken:accessToken
+        accessToken:accessToken,
+        isVerified: false,
+
     };
 
 

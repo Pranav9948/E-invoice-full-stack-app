@@ -7,6 +7,7 @@ const RegistrationPage = () => {
     registrationName: "",
     isMalaysian: "",
     tinNumber: "",
+    idType: "",
     idNumber: "",
     msicCode: "",
     industry: "",
@@ -17,10 +18,13 @@ const RegistrationPage = () => {
     contactNumber: "",
     clientId: "",
     clientSecret: "",
+    isVerified: false,
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log('value',value,name);
+    
     setFormData({ ...formData, [name]: value });
   };
 
@@ -40,7 +44,10 @@ const RegistrationPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted Data:", formData);
+    console.log("Submitted Data:", formData.idNumber);
+
+
+ 
 
     try {
       const response = await axios.post(
@@ -66,7 +73,7 @@ const RegistrationPage = () => {
   useEffect(() => {
     const storedData = localStorage.getItem("travelAgentData");
     if (storedData) {
-      navigate("/my-profile");
+      // navigate("/my-profile");
     }
   }, []);
 
@@ -126,21 +133,77 @@ const RegistrationPage = () => {
             />
           </div>
 
+          {/* id type selection */}
+
           <div className="mb-4">
-            <label className="block text-gray-700 pb-2 font semi-bold">
+            <label className="block text-gray-700 pb-2 font-semibold">
               {formData.isMalaysian === "yes"
                 ? "MyKad/MyTetra Identification Number"
                 : "Passport/MyPR/MyKAS Identification Number"}
             </label>
-            <input
-              type="text"
-              name="idNumber"
-              value={formData.idNumber}
+            <select
+              name="idType"
+              value={formData.idType}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
               required
-            />
+            >
+              {formData.isMalaysian === "yes" ? (
+                <>
+                  <option>Select</option>
+                  <option value="mykad">MyKad</option>
+                  <option value="mytetra">MyTetra</option>
+                </>
+              ) : (
+                <>
+                  <option>Select</option>
+                  <option value="passport">Passport</option>
+                  <option value="mypr">MyPR</option>
+                  <option value="mykas">MyKAS</option>
+                </>
+              )}
+            </select>
+
+            <div className="mt-4">
+              <label className="block text-gray-700 pb-2 font-semibold">
+                {formData.idType === "mykad"
+                  ? "Enter MyKad number"
+                  : formData.idType === "mytetra"
+                  ? "Enter MyTetra number"
+                  : formData.idType === "passport"
+                  ? "Enter Passport number"
+                  : formData.idType === "mypr"
+                  ? "Enter MyPR number"
+                  : formData.idType === "mykas"
+                  ? "Enter MyKAS number"
+                  : "Enter ID number"}
+              </label>
+
+              <input
+                type="text"
+                name="idNumber"
+                placeholder={
+                  formData.idType === "mykad"
+                    ? "Enter MyKad number"
+                    : formData.idType === "mytetra"
+                    ? "Enter MyTetra number"
+                    : formData.idType === "passport"
+                    ? "Enter Passport number"
+                    : formData.idType === "mypr"
+                    ? "Enter MyPR number"
+                    : formData.idType === "mykas"
+                    ? "Enter MyKAS number"
+                    : "Enter ID number"
+                }
+                value={formData.idNumber}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
           </div>
+
+          {/* id type selection ends */}
 
           <div className="mb-4">
             <label className="block text-gray-700 pb-2 font semi-bold">
@@ -274,7 +337,7 @@ const RegistrationPage = () => {
             type="submit"
             className="w-full bg-[#008B8B] text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
-            Submit
+           Register
           </button>
         </form>
       </div>

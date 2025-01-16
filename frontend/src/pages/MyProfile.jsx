@@ -1,15 +1,59 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const MyProfile = () => {
   const [agentData, setAgentData] = useState(null);
+  const [isValidTaxpayer, setIsValidTaxpayer] = useState(false);
+  const [isVerifiedTaxpayer, setIsVerifiedTaxpayer] = useState(false);
 
   useEffect(() => {
     const storedData = localStorage.getItem("travelAgentData");
     if (storedData) {
       setAgentData(JSON.parse(storedData));
     }
-  }, []);
+  }, [isVerifiedTaxpayer]);
+
+  const config = {
+    headers: {
+      authorizationtoken: agentData?.accessToken,
+    },
+  };
+
+  const storedData = localStorage.getItem("travelAgentData");
+  if (storedData) {
+    const agentData = JSON.parse(storedData);
+
+    console.log("Agent Data:", agentData);
+  }
+
+  const handleTaxpayerValidation = async () => {
+    const { tinNumber, idNumber, idType } = agentData;
+
+    try {
+      const response = await axios.post(
+        "http://localhost:7000/api/general/verificationTIN",
+
+        {
+          tinNumber,
+          idType,
+          idNumber,
+        },
+        config
+      );
+      console.log("API Response:", response.data);
+      setIsVerifiedTaxpayer(true);
+
+      alert("API call successful!");
+
+      agentData.isVerified = true;
+
+      localStorage.setItem("travelAgentData", JSON.stringify(agentData));
+    } catch (error) {
+      console.error("Error making API call:", error);
+      alert("Failed to make the API call.");
+    }
+  };
 
   return (
     <div className="bg-[#008B8B] py-20 min-h-screen">
@@ -66,12 +110,37 @@ const MyProfile = () => {
                 </div>
               </div>
             </div>
+
             <div className="p-4 bg-gray-100 border-t">
-              <Link to={"/submit-einvoice"}>
-                <button className="w-full bg-teal-500 text-white py-2 rounded-lg hover:bg-teal-600 transition">
-                  Submit-Einvoice
-                </button>
-              </Link>
+              {agentData?.isVerified ? (
+                <Link to={"/submit-einvoice"}>
+                  <button className="w-full bg-teal-500 text-white py-2 rounded-lg hover:bg-teal-600 transition">
+                    Submit-Einvoice
+                  </button>
+                </Link>
+              ) : (
+                <div className="flex flex-col items-center gap-1 w-full">
+                  <button
+                    onClick={handleTaxpayerValidation}
+                    className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition mb-2"
+                  >
+                    Verify TIN
+                  </button>
+
+                <div className="w-full">
+                 <Link to={"/"}>
+                  <button
+                   
+                    className="w-full bg-red-700 text-white py-2 rounded-lg hover:bg-red-600 transition mb-2"
+                  >
+                    Back to Register
+                  </button>
+                  </Link>
+                  </div>
+                </div>
+
+
+              )}
             </div>
           </div>
         </div>
