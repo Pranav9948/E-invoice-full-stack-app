@@ -121,7 +121,7 @@ exports.verifyTIN = async (req, res) => {
   
   
 
-  console.log('Client ID:', clientId, 'Client Secret:', clientSecret);
+  console.log('Client ID:', clientId, 'Client Secret:', clientSecret,onbehalfofTIN);
 
 
 

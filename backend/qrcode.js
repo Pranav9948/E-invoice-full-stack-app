@@ -40,6 +40,6 @@ QRCode.toDataURL(validationLink, function (err, code) {
 
   const cleanedBase64 = removeDataURIPrefix(code);
 
-  console.log("base64".america,cleanedBase64);
+  console.log("base64".america,cleanedBase64); 
 });
     
